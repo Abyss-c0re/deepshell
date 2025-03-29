@@ -4,4 +4,4 @@ __pycache__/
 **/__pycache__/
 .gitignore
 .git/
-command_processor/processor.py.bak
+deepshell.log
