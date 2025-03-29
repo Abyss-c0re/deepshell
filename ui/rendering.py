@@ -25,7 +25,9 @@ class Rendering:
             self._processing_task = asyncio.create_task(self._process_queue())
 
     async def _process_queue(self) -> None:
-        """Continuously process print jobs from the queue."""
+        """
+        Continuously process print jobs from the queue.
+        """
         while True:
             content = await self.queue.get()
             await self._execute_fancy_print(content)
@@ -70,7 +72,9 @@ class Rendering:
 
     @staticmethod
     async def _fancy_print(content:str) -> None:
-        """Static method to enqueue print job."""
+        """
+        Static method to enqueue print job.
+        """
         if Rendering._chat_app_instance:
             await Rendering._chat_app_instance.rendering.fancy_print(content)
 

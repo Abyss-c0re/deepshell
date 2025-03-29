@@ -58,6 +58,9 @@ class CommandExecutor:
             self, 
             command: str
     ) -> str | None:
+        """
+        Executing command in a current shell session
+        """
         if self.process is None or self.process.stdin is None or self.process.stdout is None:
             await self.start_shell()
             if self.process is None or self.process.stdin is None or self.process.stdout is None:

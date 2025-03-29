@@ -13,7 +13,9 @@ CONFIG_PATH = os.path.join(BASE_DIR, "..", "config", "settings.py")
 REQUIRED_VERSION = "0.6.2"
 
 def get_installed_version():
-    """Check the installed Ollama version."""
+    """
+    Check the installed Ollama version.
+    """
     try:
         output = subprocess.check_output(["ollama", "--version"], text=True).strip()
         return output.split()[-1]
@@ -21,7 +23,9 @@ def get_installed_version():
         return None
 
 def ensure_ollama():
-    """Check if Ollama is installed and up to date. If not, print instructions and return False."""
+    """
+    Check if Ollama is installed and up to date. If not, print instructions and return False.
+    """
     installed_version = get_installed_version()
 
     if installed_version is None:
@@ -38,7 +42,9 @@ def ensure_ollama():
     return True
 
 def extract_model_names(config_path=CONFIG_PATH):
-    """ Extract values from all *_MODEL variables in settings.py """
+    """
+    Extract values from all *_MODEL variables in settings.py 
+    """
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"The configuration file '{config_path}' does not exist.")
 
@@ -62,7 +68,9 @@ def extract_model_names(config_path=CONFIG_PATH):
     return model_names
 
 def validate_install(config_path=CONFIG_PATH):
-    """ Ensure Ollama is installed and up to date before checking models. """
+    """
+    Ensure Ollama is installed and up to date before checking models.
+    """
 
     if DEFAULT_HOST != "http://localhost:11434":
         return True

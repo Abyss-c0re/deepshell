@@ -124,7 +124,9 @@ class Topic:
             message: str, 
             embedding: np.ndarray
     ) -> None :
-        """Stores raw messages and their embeddings."""
+        """
+        Stores raw messages and their embeddings.
+        """
         self.history.append({"role": role, "content": message})
         self.history_embeddings.append(embedding)
         logger.info(f"Message added to: {self.name}")

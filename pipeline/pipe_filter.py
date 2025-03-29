@@ -20,7 +20,9 @@ class PipeFilter:
             extract_code:bool = False, 
             render:bool = True
     ) -> None:
-        """Processes the input stream, handling thoughts and code differently based on config."""
+        """
+        Processes the input stream, handling thoughts and code differently based on config.
+        """
         full_input = ""
         results = ""
 
@@ -105,7 +107,9 @@ class PipeFilter:
             text: str, 
             extract_code:bool = False
     ) -> str:
-        """Processes a static string, handling thoughts and code differently based on config."""
+        """
+        Processes a static string, handling thoughts and code differently based on config.
+        """
         if extract_code:
             self.ollama_client.last_response = text
             self.extracted_code = await self.extract_code(response=text)
@@ -133,7 +137,9 @@ class PipeFilter:
             self, 
             response: str
     ) -> str:
-        """Extracts a shell command from the response."""
+        """
+        Extracts a shell command from the response.
+        """
         shell_pattern = r'```(?:sh|bash)\n(.*?)```'
         match = re.search(shell_pattern, response, re.DOTALL)
 
@@ -152,7 +158,9 @@ class PipeFilter:
             self, 
             response: str
     ) -> str | None:
-            """Extracts all code snippets from the response and separates them with comments if needed."""
+            """
+            Extracts all code snippets from the response and separates them with comments if needed.
+            """
             pattern = r'```(\w+)?\n(.*?)```'
             matches = re.findall(pattern, response, re.DOTALL)
 

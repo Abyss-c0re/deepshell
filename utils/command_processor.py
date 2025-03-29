@@ -11,7 +11,9 @@ logger = Logger.get_logger()
 
 
 class CommandProcessor:
-    """Handles user input"""
+    """
+    Handles user input
+    """
     
     def __init__(
             self, 

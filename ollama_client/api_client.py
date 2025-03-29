@@ -47,7 +47,9 @@ class OllamaClient:
             self,
             mode:Mode
     ) -> None:
-        """Dynamically switches mode and updates config."""
+        """
+        Dynamically switches mode and updates config.
+        """
         logger.info(f"Switching mode from {self.mode} to {mode}")
         if mode == self.mode:
             logger.info("Mode is the same, no switch needed")
@@ -69,7 +71,9 @@ class OllamaClient:
             input=None, 
             history=None
     ) -> None:
-        """Fetches response from the Ollama API and streams into output buffer."""
+        """
+        Fetches response from the Ollama API and streams into output buffer.
+        """
         async with OllamaClient._global_lock:
             logger.info(f"{self.mode.name} started stream")
 
@@ -107,7 +111,9 @@ class OllamaClient:
             image: str | None, 
             prompt: str = "Describe"
     )-> str | None:
-        """Describes an image using the vision model."""
+        """
+        Describes an image using the vision model.
+        """
         async with OllamaClient._global_lock:
             logger.info(f"{self.mode.name} describing image")
             
@@ -135,7 +141,9 @@ class OllamaClient:
             self, 
             input:str
     ) -> str:
-        """Fetches a complete response from the model."""
+        """
+        Fetches a complete response from the model.
+        """
         async with OllamaClient._global_lock:
             logger.info(f"{self.mode.name} is fetching response")
 
@@ -158,7 +166,9 @@ class OllamaClient:
             input:str, 
             functions: list  = []
     )-> Sequence | None:
-        """Fetches a complete response from the model."""
+        """
+        Fetches a complete response from the model.
+        """
         async with OllamaClient._global_lock:
             logger.info(f"{self.mode.name} is fetching response")
             logger.info(functions)

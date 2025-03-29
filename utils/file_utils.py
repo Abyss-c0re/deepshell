@@ -168,7 +168,8 @@ class FileUtils:
             file_path:str
     )-> bool:
         """ Checks if file at provided file_path:str is an image
-        Returns bool"""
+        Returns bool
+        """
         try:
             mime = magic.Magic(mime=True)
             return mime.from_file(file_path).startswith("image")
@@ -287,9 +288,10 @@ class FileUtils:
             root_folder:str| None = None,
             ignored_folders: list = IGNORED_FOLDERS
     ) -> str | None:
-        """Recursively scans and reads all files in a folder.
-           The folder structure is generated for all files; however, only files with safe extensions
-           are attempted to be read (others are skipped).
+        """
+        Recursively scans and reads all files in a folder.
+        The folder structure is generated for all files; however, only files with safe extensions
+        are attempted to be read (others are skipped).
         """
         logger.info(f"Opening {folder_path}")
         printer(f"Opening {folder_path}",True)
