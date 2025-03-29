@@ -4,7 +4,9 @@ from utils.args_utils import parse_args
 from ollama_client.api_client import OllamaClient
 
 class ClientDeployer:
-    """Deploys an isntance of Ollama API Client"""
+    """
+    Deploys an isntance of Ollama API Client
+    """
     def __init__(
             self,
             mode: Mode | None = None
