@@ -101,7 +101,6 @@ class PipeFilter:
         self.ollama_client.thoughts = thought_buffer
         logger.debug(f"PipeFilter output: {results} \nThoughts: {thought_buffer}")
 
-
     async def process_static(
             self, 
             text: str, 

@@ -27,7 +27,6 @@ class PipeUtils:
         """
         pipe_input = await self.read_pipe()
 
-
         if pipe_input:
             if user_input:
                 user_input = self.processor.format_input(user_input, pipe_input)

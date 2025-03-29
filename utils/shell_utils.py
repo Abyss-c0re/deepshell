@@ -325,7 +325,6 @@ class CommandExecutor:
         Args:
             output_lines (list): Collected output lines.
         
-
         Returns:
             str: The final output.
         """
@@ -356,7 +355,6 @@ class CommandExecutor:
             else:
                 self.sudo_password = None
                 logger.warning("Sudo session expired, password required again.")
-
 
         # Prompt for a new password
         sudo_password = await self._get_user_input("Enter sudo password: ", is_password=True)

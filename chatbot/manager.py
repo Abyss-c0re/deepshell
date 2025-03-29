@@ -34,8 +34,7 @@ class ChatManager:
         self.tasks = []
         self.task_queue = asyncio.Queue()
         self.worker_running = False
-
-      
+ 
     async def init(self):
         """
         Helper function to initialize ChatMode.
@@ -123,7 +122,6 @@ class ChatManager:
         logger.info("Deploy task completed.")
         return response
 
-
     async def deploy_chatbot_method(
         self,
         coro_func: Callable[..., Any],  # Accepts any callable, but should be validated
@@ -154,7 +152,6 @@ class ChatManager:
             asyncio.create_task(self.task_worker())
 
         return await future
-
 
     async def task_worker(self) -> None:
         """
@@ -246,7 +243,6 @@ class ChatManager:
         self.client.switch_mode(self.last_mode)
 
         return tools
-
 
     async def _handle_helper_mode(
             self, 
@@ -417,7 +413,6 @@ class ChatManager:
         else:
             response = await self.deploy_chatbot_method(self.client._fetch_response, input)
             return await self.filtering.process_static(response, False)
-
 
     async def execute_tasks(self) -> None:
         try:

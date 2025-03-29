@@ -42,7 +42,6 @@ class OllamaClient:
 
         logger.info(f"Client initialized with model: {model}, mode: {mode}, stream: {stream}")
 
-
     def switch_mode(
             self,
             mode:Mode
@@ -65,7 +64,6 @@ class OllamaClient:
         except KeyError as e:
             logger.error(f"Invalid mode: {mode}. Error: {e}")
 
-    
     async def _chat_stream(
             self, 
             input=None, 
@@ -104,7 +102,6 @@ class OllamaClient:
 
             except Exception as e:
                 logger.error(f"Error during chat stream: {e}")
-
 
     async def _describe_image(
             self, 
@@ -160,7 +157,6 @@ class OllamaClient:
                 logger.error(f"Error fetching response: {e}")
                 return "Error fetching response"
 
-
     async def _call_function(
             self, 
             input:str, 
@@ -187,7 +183,6 @@ class OllamaClient:
             except Exception as e:
                 logger.error(f"Error fetching response: {e}")
                 return "Error fetching response"
-
 
     @staticmethod
     async def fetch_embedding(

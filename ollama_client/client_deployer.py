@@ -4,9 +4,7 @@ from utils.args_utils import parse_args
 from ollama_client.api_client import OllamaClient
 
 class ClientDeployer:
-    """
-    Deploys an isntance of Ollama API Client
-    """
+
     def __init__(
             self,
             mode: Mode | None = None
@@ -31,7 +29,11 @@ class ClientDeployer:
         self.config = self.generate_config(temp=config["temp"], prompt=config["prompt"])
         self.stream = config["stream"]
 
-    def deploy(self):
+    def deploy(self)-> OllamaClient:
+        """
+        Deploys an isntance of Ollama API Client
+        """
+
         if self.args.host:
             self.host = self.args.host
         if self.args.model:
@@ -51,6 +53,6 @@ class ClientDeployer:
             self, 
             temp=0.7, 
             prompt=""
-    ):
+    )-> dict:
         return {"temperature": temp, "system": prompt}
 

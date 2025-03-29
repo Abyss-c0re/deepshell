@@ -357,8 +357,7 @@ class HistoryManager:
             candidate = match.group(0)
             if not re.search(r"\.[a-zA-Z0-9]+$", candidate):
                 return candidate
-        return None
- 
+        return None 
     
     async def get_relevant_content(
             self, 
@@ -433,7 +432,6 @@ class HistoryManager:
 
         logger.info("No matching content found.")
         return None
-
 
     async def fetch_embedding(
             self, 

@@ -12,7 +12,6 @@ class PromptHelper:
     user_system = platform.uname()
     current_time = datetime.now().isoformat()
 
-
     @staticmethod
     def shell_helper(user_input: str) -> str:
         """
@@ -31,7 +30,6 @@ class PromptHelper:
         If the command requires administrative privileges, include 'sudo'.
         User request: {user_input}
         """
-
 
     @staticmethod
     def analyzer_helper(command: str, output: str) -> str:
@@ -79,7 +77,6 @@ class PromptHelper:
         - "topic_name": The name of the topic.
         - "topic_description": A brief description of the topic.
         """
-
 
     @staticmethod
     def analyze_code(content: str) -> str:
