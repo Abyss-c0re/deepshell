@@ -10,7 +10,7 @@ from ui.printer import printer
 from utils.logger import Logger
 
 from ui.popups import RadiolistPopup
-from config.settings import IGNORE_DOT_FILES, SUPPORTED_EXTENSIONS, IGNORED_FOLDERS, MAX_FILE_SIZE, MAX_LINES, CHUNK_SIZE, PROCESS_IMAGES, IMG_INPUT_RES
+from config.settings import IGNORE_DOT_FILES, SUPPORTED_EXTENSIONS, IGNORED_FOLDERS, MAX_FILE_SIZE, MAX_LINES, PROCESS_IMAGES, IMG_INPUT_RES
 
 logger = Logger.get_logger()
 
@@ -102,12 +102,12 @@ class FileUtils:
                         logger.info(f"Skipping image file {file_path}")
 
                 printer(f"Reading {file_path}",True)
-
-                if os.path.getsize(file_path) > max_file_size:
-                    content = await self._read_last_n_lines(file_path, max_lines)
-                else:
-                    async with aiofiles.open(file_path, 'r', encoding="utf-8", errors="ignore") as file:
-                        content = await file.read()
+                content = await _read_file(file_path)
+                if content:
+                    n_lines = len(content.splitlines())
+                    logger.info(f"Read {n_lines} lines of text")
+                    if os.path.getsize(file_path) > max_file_size or n_lines > max_lines:
+                        content = await self._read_last_n_lines(content, max_lines)
 
                 return content
 
@@ -200,37 +200,30 @@ class FileUtils:
         except Exception as e:
             logger.error(f"Error processing image {file_path}: {e}")
 
+
+
     async def _read_last_n_lines(
-            self, 
-            file_path:str, 
-            num_lines:int,
-            chunk_size:int = CHUNK_SIZE
+            self,
+            file_content: str, 
+            num_lines: int, 
+            last: bool = True
     ) -> str:
         """
-        Trimps the file output.
+        Function to return lines from file content.
+        If 'last' is True, returns the last `num_lines` lines; otherwise, returns the first `num_lines`.
         """
         buffer = []
-        loop = asyncio.get_running_loop()
+        lines = file_content.splitlines()
+        
+        if last:
+            start_index = max(0, len(lines) - num_lines)
+            buffer = lines[start_index:]
+        else:
+            end_index = min(len(lines), num_lines)
+            buffer = lines[:end_index]
+        
+        return "\n".join(buffer) if buffer else "[File is empty]"
 
-        async with aiofiles.open(file_path, 'r', encoding="utf-8", errors="ignore") as file:
-            file_size = await loop.run_in_executor(None, lambda: self._get_file_size(file_path))
-            pos = file_size
-            data = ""
-
-            while pos > 0 and len(buffer) < num_lines:
-                pos = max(0, pos - chunk_size)
-                await file.seek(pos)
-                chunk = await file.read(chunk_size)
-                data = chunk + data
-                lines = data.splitlines()
-
-                if len(lines) > num_lines:
-                    buffer = lines[-num_lines:]
-                    break
-                else:
-                    buffer = lines
-
-            return "\n".join(buffer) if buffer else "[File is empty]"
 
     def _get_file_size(
             self, 
@@ -394,4 +387,24 @@ class FileUtils:
             if choice == "cancel":
                 return "cancel"
             return choice
+
+async def _read_file( 
+            file_path: str
+    ) -> str | None:
+        """
+        Asynchronously reads a file.
+        
+        Args:
+            file_path (str): The file's path.
+        
+        Returns:
+            str: The file's content.
+        """
+        try:
+            async with aiofiles.open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                content = await f.read()
+            return content
+        except (IOError, OSError) as e:
+            logger.error(f" Error reading file {file_path}: {str(e)}")
+            return None
 
