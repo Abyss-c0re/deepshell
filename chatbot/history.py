@@ -1,12 +1,12 @@
 import os
 import re
 import asyncio
-import aiofiles
 import numpy as np
 from datetime import datetime
 from utils.logger import Logger
 from typing import Tuple, Optional
 from chatbot.helper import PromptHelper
+from utils.file_utils import _read_file
 from ollama_client.api_client import OllamaClient
 from sklearn.metrics.pairwise import cosine_similarity
 from config.settings import OFF_THR, MSG_THR, CONT_THR, NUM_MSG, OFF_FREQ, SLICE_SIZE 
@@ -73,28 +73,6 @@ class Project:
             # Generate a unique identifier, e.g., using a timestamp.
             identifier = f"terminal_{datetime.now().isoformat()}"
         self._index_content(identifier, output, embedding, content_type="terminal")
-
-    async def _read_file(
-            self, 
-            file_path: str
-    ) -> tuple[str, str]:
-        """
-        Asynchronously reads a file.
-        
-        Args:
-            file_path (str): The file's path.
-        
-        Returns:
-            tuple[str, str]: The file path and its content.
-        """
-        try:
-            async with aiofiles.open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = await f.read()
-            return file_path, content
-        except (IOError, OSError) as e:
-            logger.error(f" Error reading file {file_path}: {str(e)}")
-            return file_path, ""
-
 
 class Topic:
 
@@ -425,7 +403,7 @@ class HistoryManager:
                     results.append((id, self.current_project.file_embeddings[id]["content"]))
                     logger.info(f"Added content from file '{id}' to results.")
                 else:
-                    _, content = await self.current_project._read_file(id)
+                    content = await _read_file(id)
                     results.append((id, content))
                     logger.info(f"Added content from file '{id}' to results (Read from file path).")
             return results
