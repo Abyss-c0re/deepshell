@@ -1,6 +1,6 @@
 Input,
 RichLog {
-    border: white;
+    border:none;
 }
 
 RichLog:focus {
