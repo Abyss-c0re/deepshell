@@ -22,6 +22,11 @@ def get_installed_version():
     except (subprocess.CalledProcessError, FileNotFoundError):
         return None
 
+def parse_version(v: str):
+    """Convert a version string like '0.12.3' into a tuple of ints (0,12,3)."""
+    return tuple(int(part) for part in v.split(".") if part.isdigit())
+
+
 def ensure_ollama():
     """
     Check if Ollama is installed and up to date. If not, print instructions and return False.
@@ -33,13 +38,14 @@ def ensure_ollama():
         print("curl -fsSL https://ollama.com/install.sh | sh")
         return False
 
-    if installed_version < REQUIRED_VERSION:
+    if parse_version(installed_version) < parse_version(REQUIRED_VERSION):
         print(f"Ollama version {installed_version} is outdated. Run the following command to update:")
         print("curl -fsSL https://ollama.com/install.sh | sh")
         return False
 
     logger.info(f"Ollama is installed and up to date (version {installed_version}).")
     return True
+
 
 def extract_model_names(config_path=CONFIG_PATH):
     """
