@@ -13,12 +13,20 @@ class Mode(Enum):
 # Ollama Settings
 DEFAULT_HOST = "http://localhost:11434"
 
-DEFAULT_MODEL = "phi4:14b"
-CODE_MODEL = "deepseek-coder-v2:16b"
-SHELL_MODEL = "granite3.2:8b"
-SYSTEM_MODEL = "granite3.2:8b"
+# DEFAULT_MODEL = "phi4:14b"
+# CODE_MODEL = "deepseek-coder-v2:16b"
+# SHELL_MODEL = "granite3.2:8b"
+# SYSTEM_MODEL = "granite3.2:8b"
+# HELPER_MODEL = "deepseek-r1:1.5b"
+# VISION_MODEL = "minicpm-v:8b"
+# EMBEDDING_MODEL = "nomic-embed-text:latest"
+
+DEFAULT_MODEL = "deepseek-r1:1.5b"
+CODE_MODEL = "deepseek-r1:1.5b"
+SHELL_MODEL = "deepseek-r1:1.5b"
+SYSTEM_MODEL = "deepseek-r1:1.5b"
 HELPER_MODEL = "deepseek-r1:1.5b"
-VISION_MODEL = "minicpm-v:8b"
+VISION_MODEL = "deepseek-r1:1.5b"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
 
 # Mapping Mode to Configuration
