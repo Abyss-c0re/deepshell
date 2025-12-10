@@ -100,10 +100,6 @@ DeepShell may be bound within a Docker vessel, self-contained and portable, with
 
 ### Forging the Vessel
 
-First, ensure the required files are present in the repository root:
-- `Dockerfile`
-- `entrypoint.sh` (executable script that launches Ollama and DeepShell)
-
 Build the image, choosing your hardware's essence:
 
 ```sh
@@ -115,7 +111,9 @@ docker build --build-arg OLLAMA_VARIANT=rocm -t deepshell .
 ```
 
 **Summoning the Vessel**
+
 CPU
+
 ```sh
 docker run -it --rm \
   -v /:/host:ro \
@@ -123,6 +121,7 @@ docker run -it --rm \
   deepshell
 ```
 NVIDIA GPU (requires NVIDIA Container Toolkit installed and Docker restarted)
+
 ```sh
 docker run -it --rm \
   -v /:/host:ro \
@@ -131,6 +130,7 @@ docker run -it --rm \
   deepshell
 ```
 AMD GPU (ROCm)
+
 ```sh
 docker run -it --rm \
   -v /:/host:ro \
