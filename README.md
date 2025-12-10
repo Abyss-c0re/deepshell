@@ -94,6 +94,52 @@ deepshell "open this folder"
 deepshell "open this folder and analyze the code"
 ```
 
+** The Vessel of Containment: Docker **
+
+DeepShell may be bound within a Docker vessel, self-contained and portable, with Ollama as its inner oracle.
+
+### Forging the Vessel
+
+First, ensure the required files are present in the repository root:
+- `Dockerfile`
+- `entrypoint.sh` (executable script that launches Ollama and DeepShell)
+
+Build the image, choosing your hardware's essence:
+
+```sh
+# CPU only (or NVIDIA fallback)
+docker build -t deepshell .
+
+# AMD GPU (ROCm acceleration)
+docker build --build-arg OLLAMA_VARIANT=rocm -t deepshell .
+```
+
+**Summoning the Vessel**
+CPU
+```sh
+docker run -it --rm \
+  -v /:/host:ro \
+  -p 11434:11434 \
+  deepshell
+```
+NVIDIA GPU (requires NVIDIA Container Toolkit installed and Docker restarted)
+```sh
+docker run -it --rm \
+  -v /:/host:ro \
+  -p 11434:11434 \
+  --gpus all \
+  deepshell
+```
+AMD GPU (ROCm)
+```sh
+docker run -it --rm \
+  -v /:/host:ro \
+  -p 11434:11434 \
+  --device /dev/kfd \
+  --device /dev/dri \
+  deepshell
+```
+
 **Echoes in the Abyss: The Neovim Conduit**
 
 The [DeepShell.nvim](https://github.com/Abyss-c0re/deepshell-nvim) plugin serves as the unseen bridge between the arcane depths of Neovim and the profound intelligence of DeepShell.
@@ -101,4 +147,6 @@ The [DeepShell.nvim](https://github.com/Abyss-c0re/deepshell-nvim) plugin serves
 
 
 _A tool forged for precision in a chaotic world. Your words, its execution, seamless in form._
+
+
 
