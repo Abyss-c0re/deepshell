@@ -140,6 +140,24 @@ docker run -it --rm \
   deepshell
 ```
 
+#### Eternal Docker Models (Optional)
+
+By default, the vessel is ephemeral—destroyed upon dismissal, its memories scattered to the void.  
+Yet the oracle’s wisdom (downloaded models) and any traces DeepShell may leave behind can be made eternal through binding volumes.
+
+
+Preserve all summoned models across invocations:
+
+```sh
+# Create the eternal repository (once)
+docker volume create ollama-models
+```
+Include the binding in every summoning:
+```sh
+-v ollama-models:/root/.ollama
+```
+
+
 **Echoes in the Abyss: The Neovim Conduit**
 
 The [DeepShell.nvim](https://github.com/Abyss-c0re/deepshell-nvim) plugin serves as the unseen bridge between the arcane depths of Neovim and the profound intelligence of DeepShell.
