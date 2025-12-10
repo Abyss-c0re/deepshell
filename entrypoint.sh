@@ -1,16 +1,11 @@
 #!/bin/bash
 
-echo "Starting Ollama server in the background..."
-ollama serve &
+# Start Ollama completely silently — no logs at all
+ollama serve > /dev/null 2>&1 &
 OLLAMA_PID=$!
 
-echo "Waiting 15 seconds for Ollama to fully initialize..."
+# Wait quietly for startup
 sleep 15
 
-echo "Ollama is ready! Starting DeepShell..."
-
-# Run DeepShell, passing any command-line arguments (e.g., --shell)
+# Only DeepShell output will appear
 exec python main.py "$@"
-
-# Keep the container running even if DeepShell exits (optional, but safe)
-wait $OLLAMA_PID
