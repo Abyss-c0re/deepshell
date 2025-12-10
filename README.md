@@ -156,7 +156,9 @@ Include the binding in every summoning:
 ```sh
 -v ollama-models:/root/.ollama
 ```
-
+The void now remembers.
+Models remain. Traces linger.
+Each summoning is instant, familiar, and unbroken.
 
 **Echoes in the Abyss: The Neovim Conduit**
 
