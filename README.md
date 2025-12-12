@@ -94,11 +94,11 @@ deepshell "open this folder"
 deepshell "open this folder and analyze the code"
 ```
 
-** The Vessel of Containment: Docker **
+### The Vessel of Containment: Docker
 
 DeepShell may be bound within a Docker vessel, self-contained and portable, with Ollama as its inner oracle.
 
-### Forging the Vessel
+**Forging the Vessel**
 
 Build the image, choosing your hardware's essence:
 
