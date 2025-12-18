@@ -7,9 +7,8 @@ from ollama_client.client_deployer import ClientDeployer
 
 logger = Logger.get_logger()
 
-def deploy_chatbot(
-        mode: Mode | None = None
-) -> Tuple[OllamaClient, PipeFilter]:
+
+def deploy_chatbot(mode: Mode | None = None) -> Tuple[OllamaClient, PipeFilter]:
     """
     Deploys a chatbot with an optional mode.
     """
@@ -17,5 +16,4 @@ def deploy_chatbot(
     chatbot = client_deployer.deploy()
     filter = PipeFilter(chatbot)
 
-    return chatbot,filter
-
+    return chatbot, filter

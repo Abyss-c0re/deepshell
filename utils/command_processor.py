@@ -14,25 +14,20 @@ class CommandProcessor:
     """
     Handles user input
     """
-    
-    def __init__(
-            self, 
-            manager 
-    ):
+
+    def __init__(self, manager):
         self.manager = manager
         self.ui = manager.ui
         self.file_utils = FileUtils(manager)
         self.executor = CommandExecutor(self.ui)
 
-
     async def handle_command(
-            self, 
-            user_input: str
-    )-> Tuple[str,str | None] | Tuple[None,None]:
+        self, user_input: str
+    ) -> Tuple[str, str | None] | Tuple[None, None]:
         """
         Processes commands, handles file/folder operations, and updates config.
         """
-        
+
         # Handle shell bypass if user input starts with "!"
         if user_input.startswith("!"):
             return user_input[1:], "shell_bypass"
@@ -48,25 +43,25 @@ class CommandProcessor:
         # If there is a user input to process
         if user_input:
             target, additional_action = await self.detect_action(user_input)
-            
+
             if target:
                 pass_image = False
-                
+
                 # Check if the target is an image, switch to vision mode if true
                 if self.file_utils._is_image(target):
                     pass_image = True
                     self.manager.client.switch_mode(Mode.VISION)
                 else:
                     await self.file_utils.process_file_or_folder(target)
-                    
+
                 # If there's an additional action to update the user input
                 if additional_action:
                     user_input = additional_action
-                    
+
                 # Return the user input along with target if it's an image
                 if pass_image:
                     return user_input, target
-                
+
                 return user_input, None
             else:
                 # If no target was found and action is "cancel", return None
@@ -76,28 +71,26 @@ class CommandProcessor:
         # Return the original user input if no specific handling was done
         return user_input, None
 
-   
-    async def detect_mode(
-            self, 
-            user_input: str
-    ) -> str | None:
+    async def detect_mode(self, user_input: str) -> str | None:
         """
         Detects if input starts with @ and checks if it matches a Mode.
         """
         mode_switcher = self.manager.client.switch_mode
         parts = user_input.split(" ", 1)
-        
+
         if len(parts) < 2:
             if self.ui:
-                await self.ui.fancy_print("\n\n[red]System:[/]\nNo user prompt detected after mode override\n")
+                await self.ui.fancy_print(
+                    "\n\n[red]System:[/]\nNo user prompt detected after mode override\n"
+                )
             logger.warning("No user prompt detected after user override")
             return None
 
         mode_str, after_text = parts[0][1:].upper(), parts[1]
-        
+
         try:
             mode = Mode[mode_str]
-            
+
             # Special handling for Mode.VISION
             if mode == Mode.VISION:
                 logger.warning("Mode.VISION cannot be selected directly.")
@@ -106,21 +99,17 @@ class CommandProcessor:
             mode_switcher(mode)
             logger.info(f"Mode detected: {mode.name}")
             return after_text
-            
+
         except KeyError:
-            printer("Invalid mode override",True)
+            printer("Invalid mode override", True)
             logger.warning("Invalid mode override, suspending input")
             return None
         except Exception as e:
-            printer(str(e),True)
+            printer(str(e), True)
             logger.warning(str(e))
             return None
 
- 
-    async def detect_action(
-            self, 
-            user_input: str
-    ):
+    async def detect_action(self, user_input: str):
         """
         Detects action, validates/finds target, and processes file/folder.
         """
@@ -152,10 +141,10 @@ class CommandProcessor:
         if not os.path.exists(target):
             choice = await self.file_utils.prompt_search(target)
             if not choice:
-                printer("Nothing found",True)
+                printer("Nothing found", True)
                 return None, None
             if choice == "cancel" or choice == "nothing":
-                printer("Search canceled by user",True)
+                printer("Search canceled by user", True)
                 return choice
             target = choice
 
@@ -169,10 +158,10 @@ class CommandProcessor:
         return target, additional_action
 
     def format_input(
-            self, 
-            user_input: str, 
-            file_content: str, 
-            additional_action:  Optional[str] = None
+        self,
+        user_input: str,
+        file_content: str,
+        additional_action: Optional[str] = None,
     ):
         """
         Prepares user input by combining prompt and file content.

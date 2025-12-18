@@ -2,16 +2,14 @@ import re
 import asyncio
 from config.settings import RENDER_DELAY
 
+
 class Rendering:
     _chat_app_instance = None
 
-    def __init__(
-            self, 
-            chat_app
-    ):
+    def __init__(self, chat_app):
         self.chat_app = chat_app
         Rendering._chat_app_instance = chat_app
-        self.cleaner = re.compile(r'(#{3,4}|\*\*)')
+        self.cleaner = re.compile(r"(#{3,4}|\*\*)")
         self.delay = RENDER_DELAY
         self._lock = asyncio.Lock()
         self.queue = asyncio.Queue()
@@ -34,13 +32,13 @@ class Rendering:
             self.queue.task_done()
 
     async def _execute_fancy_print(
-            self, 
-            content:str,
+        self,
+        content: str,
     ) -> None:
         """
         Render string line by line, preserving newlines and whitespace.
         """
-        lines = content.split('\n')
+        lines = content.split("\n")
         if len(lines) > 1:
             self.chat_app.lock_input()
 
@@ -50,31 +48,24 @@ class Rendering:
 
         self.chat_app.unlock_input()
 
-    async def render_output(
-            self, 
-            line:str
-    ) -> None:
+    async def render_output(self, line: str) -> None:
         """
         Render lines while stripping some markdown tags.
         """
         async with self._lock:
-            cleaned_line = self.cleaner.sub('', line.rstrip())
+            cleaned_line = self.cleaner.sub("", line.rstrip())
             self.chat_app.rich_log_widget.write(cleaned_line)
 
-    async def fancy_print(
-            self, 
-            content:str
-    ) -> None:
+    async def fancy_print(self, content: str) -> None:
         """
         Add print job to queue and ensure execution order.
         """
         await self.queue.put(content)
 
     @staticmethod
-    async def _fancy_print(content:str) -> None:
+    async def _fancy_print(content: str) -> None:
         """
         Static method to enqueue print job.
         """
         if Rendering._chat_app_instance:
             await Rendering._chat_app_instance.rendering.fancy_print(content)
-

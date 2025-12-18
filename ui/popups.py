@@ -6,16 +6,14 @@ from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
 from textual.widgets import Static, RadioSet, RadioButton
 
+
 class RadiolistPopup(Widget):
     """
     A popup widget that displays a scrollable radio list for selection and returns the chosen valuei.
     """
+
     def __init__(
-            self, 
-            title: str, 
-            text: str, 
-            options: list[tuple[str, str]], 
-            **kwargs:Any
+        self, title: str, text: str, options: list[tuple[str, str]], **kwargs: Any
     ) -> None:
         """
         :param title: The title of the popup.
@@ -39,12 +37,9 @@ class RadiolistPopup(Widget):
         self.query_one(RadioSet).focus()
         self.focus()
 
-    async def on_key(
-            self, 
-            event: events.Key
-    ) -> None:
+    async def on_key(self, event: events.Key) -> None:
         radio_set = self.query_one(RadioSet)
-        index = radio_set.pressed_index  
+        index = radio_set.pressed_index
         if event.key in ("enter", "space"):
             if index != -1:
                 choice = self.options[index][0]
@@ -54,7 +49,11 @@ class RadiolistPopup(Widget):
             if not self.choice_future.done():
                 self.choice_future.set_result("cancel")
         elif event.key in ("up", "down"):
-            selected_button = radio_set.children[index] if 0 <= index < len(radio_set.children) else None
+            selected_button = (
+                radio_set.children[index]
+                if 0 <= index < len(radio_set.children)
+                else None
+            )
             if selected_button:
                 scroll_view = self.query_one("#popup_scroll_view")
                 scroll_view.scroll_to_widget(selected_button, animate=True)

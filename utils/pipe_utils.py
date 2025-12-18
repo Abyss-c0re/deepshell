@@ -5,6 +5,7 @@ from utils.logger import Logger
 
 logger = Logger.get_logger()
 
+
 class PipeUtils:
     def __init__(self, chat_manager):
         self.chat_manager = chat_manager
@@ -17,11 +18,8 @@ class PipeUtils:
         loop = asyncio.get_event_loop()
         logger.info("Got the pipe content")
         return await loop.run_in_executor(None, sys.stdin.read)
-       
-    async def handle_pipe(
-            self,
-            user_input:Optional[str] = None
-    )-> None:
+
+    async def handle_pipe(self, user_input: Optional[str] = None) -> None:
         """
         Handles pipe input, formats the user input, and runs the task manager.
         """
@@ -33,4 +31,4 @@ class PipeUtils:
             else:
                 user_input = pipe_input
         results = await self.chat_manager.task_manager(user_input)
-        print(results) 
+        print(results)

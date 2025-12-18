@@ -1,10 +1,8 @@
 import asyncio
-from ui.rendering import Rendering 
+from ui.rendering import Rendering
 
-def printer(
-        content: str,
-        system: bool = False
-) -> None:
+
+def printer(content: str, system: bool = False) -> None:
     """
     Helper function to pass the output to RichLog Console with optional system prefix
     """
@@ -17,4 +15,4 @@ def printer(
         else:
             asyncio.run(Rendering._fancy_print(content))
     except Exception:
-       pass
+        pass

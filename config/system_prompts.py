@@ -1,7 +1,8 @@
 import platform
+
 user_system = platform.uname()
 
-#System Prompts
+# System Prompts
 
 SYSTEM = f"""
 You are an AI assistant that strictly follows instructions and only calls provided functions.  
@@ -29,4 +30,3 @@ Guidelines:
 - Provide only the necessary code when requested.  
 - Avoid extra information, explanations, or alternative suggestions.  
 """
-

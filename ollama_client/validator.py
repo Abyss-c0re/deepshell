@@ -12,6 +12,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, "..", "config", "settings.py")
 REQUIRED_VERSION = "0.6.2"
 
+
 def get_installed_version():
     """
     Check the installed Ollama version.
@@ -21,6 +22,7 @@ def get_installed_version():
         return output.split()[-1]
     except (subprocess.CalledProcessError, FileNotFoundError):
         return None
+
 
 def parse_version(v: str):
     """Convert a version string like '0.12.3' into a tuple of ints (0,12,3)."""
@@ -39,7 +41,9 @@ def ensure_ollama():
         return False
 
     if parse_version(installed_version) < parse_version(REQUIRED_VERSION):
-        print(f"Ollama version {installed_version} is outdated. Run the following command to update:")
+        print(
+            f"Ollama version {installed_version} is outdated. Run the following command to update:"
+        )
         print("curl -fsSL https://ollama.com/install.sh | sh")
         return False
 
@@ -49,12 +53,14 @@ def ensure_ollama():
 
 def extract_model_names(config_path=CONFIG_PATH):
     """
-    Extract values from all *_MODEL variables in settings.py 
+    Extract values from all *_MODEL variables in settings.py
     """
     if not os.path.exists(config_path):
-        raise FileNotFoundError(f"The configuration file '{config_path}' does not exist.")
+        raise FileNotFoundError(
+            f"The configuration file '{config_path}' does not exist."
+        )
 
-    with open(config_path, 'r', encoding='utf-8') as file:
+    with open(config_path, "r", encoding="utf-8") as file:
         config_content = file.read()
 
     try:
@@ -67,11 +73,16 @@ def extract_model_names(config_path=CONFIG_PATH):
     for node in ast.walk(parsed_content):
         if isinstance(node, ast.Assign):
             for target in node.targets:
-                if isinstance(target, ast.Name) and target.id.endswith('_MODEL'):
-                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
-                        model_names.add(node.value.value)  # Extract the assigned string value
+                if isinstance(target, ast.Name) and target.id.endswith("_MODEL"):
+                    if isinstance(node.value, ast.Constant) and isinstance(
+                        node.value.value, str
+                    ):
+                        model_names.add(
+                            node.value.value
+                        )  # Extract the assigned string value
 
     return model_names
+
 
 def validate_install(config_path=CONFIG_PATH):
     """

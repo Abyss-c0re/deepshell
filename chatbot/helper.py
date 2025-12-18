@@ -4,6 +4,7 @@ from utils.logger import Logger
 
 logger = Logger.get_logger()
 
+
 class PromptHelper:
     """
     A utility class for generating shell command prompts and analyzing command output.
@@ -24,7 +25,7 @@ class PromptHelper:
             str: A formatted prompt instructing the model to generate a non-interactive shell command.
         """
         return f"""
-        Generate a shell command for {PromptHelper.user_system}.
+        Generate a shell command for this OS: {PromptHelper.user_system}.
         If the command normally requires interactive input or confirmation, include appropriate flags to bypass them.
         Do not include any additional text beyond the command itself.
         If the command requires administrative privileges, include 'sudo'.
@@ -50,13 +51,16 @@ class PromptHelper:
 
 
         Summarize key details, highlighting errors, warnings, and important findings.
-        Command was executed at: {PromptHelper.current_time}
+        SYSTEM INFO:
+        Use the infomation below only if needed. Do not include it in the reply, unless user asks relevant questions.
+        System time: {PromptHelper.current_time}
+        OS: {PromptHelper.user_system}
         """
 
     @staticmethod
     def topics_helper(history: list) -> str:
         """
-        Generates a prompt instructing the model to name a topic and provide a description in JSON format 
+        Generates a prompt instructing the model to name a topic and provide a description in JSON format
         based on conversation history provided as a list.
 
         Args:
@@ -66,7 +70,7 @@ class PromptHelper:
             str: A formatted prompt instructing the model to reply in JSON format.
         """
         history_text = str(history)
-        
+
         logger.debug(f"Topics helper: injected history: {history_text}")
         return f"""
         Based on the following conversation history, please name a topic and provide a description of that topic in JSON format:

@@ -6,9 +6,10 @@ from chatbot.manager import ChatManager
 from ollama_client.validator import validate_install
 from utils.symlink_utils import create_symlink, remove_symlink
 
+
 async def async_main():
     args = parse_args()
-    
+
     if args.install:
         create_symlink()
         return
@@ -33,9 +34,14 @@ async def async_main():
             print(response)
         else:
             if chat_manager.ui:
-                chat_manager.ui.user_input, chat_manager.ui.file, chat_manager.ui.file_content = user_input, file, pipe_content
-                
+                (
+                    chat_manager.ui.user_input,
+                    chat_manager.ui.file,
+                    chat_manager.ui.file_content,
+                ) = user_input, file, pipe_content
+
                 await chat_manager.ui.run_async()
+
 
 if __name__ == "__main__":
     asyncio.run(async_main())
