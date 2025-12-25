@@ -7,3 +7,6 @@ __pycache__/
 .git/
 deepshell.log
 
+.vscode/settings.json
+pyproject.toml
+amd_docker_run.sh
