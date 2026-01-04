@@ -1,98 +1,101 @@
 import platform
+import re
 from datetime import datetime
 from utils.logger import Logger
 
 logger = Logger.get_logger()
 
 
+def _get_distro_info() -> str:
+    """
+    Detects the actual Linux distribution and returns a user-friendly string.
+    Falls back to platform.uname() if detection fails.
+    """
+    try:
+        with open("/etc/os-release", "r") as f:
+            content = f.read()
+
+        # Extract PRETTY_NAME for nice display, fallback to ID + VERSION_ID
+        pretty_name = re.search(r'^PRETTY_NAME="?(.+?)"?$', content, re.MULTILINE)
+        if pretty_name:
+            return pretty_name.group(1)
+
+        id_match = re.search(r'^ID="?(.+?)"?$', content, re.MULTILINE)
+        version_match = re.search(r'^VERSION_ID="?(.+?)"?$', content, re.MULTILINE)
+        distro_id = id_match.group(1) if id_match else "unknown"
+        version = f" {version_match.group(1)}" if version_match else ""
+        return f"{distro_id.capitalize()}{version} Linux"
+
+    except Exception as e:
+        logger.debug(f"Distro detection failed: {e}, falling back to uname")
+        return f"{platform.system()} {platform.release()} ({platform.machine()})"
+
+
 class PromptHelper:
     """
     A utility class for generating shell command prompts and analyzing command output.
+    Now with proper distro detection!
     """
 
-    user_system = platform.uname()
+    user_system = _get_distro_info()
     current_time = datetime.now().isoformat()
 
     @staticmethod
     def shell_helper(user_input: str) -> str:
         """
-        Generates a shell command prompt for the user's system.
-
-        Args:
-            user_input (str): The user's request for a shell command.
-
-        Returns:
-            str: A formatted prompt instructing the model to generate a non-interactive shell command.
+        Generates a shell command prompt tailored to the actual distro (Arch, Debian, etc.).
         """
         return f"""
-        Generate a shell command for this OS: {PromptHelper.user_system}.
-        If the command normally requires interactive input or confirmation, include appropriate flags to bypass them.
-        Do not include any additional text beyond the command itself.
-        If the command requires administrative privileges, include 'sudo'.
-        User request: {user_input}
-        """
+Generate a SINGLE, non-interactive shell command for this system: **{PromptHelper.user_system}**
+
+Rules:
+- Use the correct package manager (pacman for Arch, apt for Debian/Ubuntu, dnf for Fedora, zypper for openSUSE, etc.).
+- Never explain, never wrap in code blocks, never add extra text.
+- If the command needs sudo, include it.
+- Always use flags to make it non-interactive (-y, --noconfirm, --assume-yes, etc.).
+- Do NOT ask for confirmation.
+
+User wants to: {user_input}
+""".strip()
 
     @staticmethod
     def analyzer_helper(command: str, output: str) -> str:
-        """
-        Generates a prompt to analyze command output.
-
-        Args:
-            command (str): The executed shell command.
-            output (str): The output of the command.
-
-        Returns:
-            str: A formatted prompt instructing the model to analyze and summarize key details.
-        """
         return f"""
-        Analyze the output of the following command: {command}
+Analyze the output of the following command: {command}
 
-        Output: {output}  
+Output:
+{output}
 
+Summarize errors, warnings, success status, and key information.
+Only mention system details if relevant to the issue.
 
-        Summarize key details, highlighting errors, warnings, and important findings.
-        SYSTEM INFO:
-        Use the infomation below only if needed. Do not include it in the reply, unless user asks relevant questions.
-        System time: {PromptHelper.current_time}
-        OS: {PromptHelper.user_system}
-        """
+SYSTEM INFO (use only if needed):
+Time: {PromptHelper.current_time}
+OS: {PromptHelper.user_system}
+""".strip()
 
     @staticmethod
     def topics_helper(history: list) -> str:
-        """
-        Generates a prompt instructing the model to name a topic and provide a description in JSON format
-        based on conversation history provided as a list.
-
-        Args:
-            history (list): A list of dictionaries containing the role and message of previous conversation exchanges.
-
-        Returns:
-            str: A formatted prompt instructing the model to reply in JSON format.
-        """
         history_text = str(history)
-
         logger.debug(f"Topics helper: injected history: {history_text}")
         return f"""
-        Based on the following conversation history, please name a topic and provide a description of that topic in JSON format:
+Based on the following conversation history, please name a topic and provide a description in JSON format:
 
-        {history_text}
+{history_text}
 
-        The response should be a JSON object with the following keys:
-        - "topic_name": The name of the topic.
-        - "topic_description": A brief description of the topic.
-        """
+Response must be valid JSON with keys:
+- "topic_name": string
+- "topic_description": string
+""".strip()
 
     @staticmethod
     def analyze_code(content: str) -> str:
-        """
-        Generates a prompt instructing the model to analyze the code and provide description in JSON format
-        """
         return f"""
-        Analyze the following code and generate structured metadata in JSON format. The metadata should include the following categories:
-        1. Functions: List of function names and their descriptions (if any).
-        2. Classes: List of class names and a brief description of their purpose.
-        3. Purpose: A brief summary of what the code is meant to accomplish or its functionality.
+Analyze the following code and return structured metadata in JSON format with these keys:
+- "functions": list of {{ "name": str, "description": str }}
+- "classes": list of {{ "name": str, "purpose": str }}
+- "purpose": brief overall summary
 
-        Code:
-        {content}
-        """
+Code:
+{content}
+""".strip()
