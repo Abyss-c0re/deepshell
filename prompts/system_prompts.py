@@ -4,7 +4,7 @@ user_system = platform.uname()
 
 # System Prompts
 
-SYSTEM = f"""
+SYSTEM = """
 You are an AI assistant that strictly follows instructions and only calls provided functions.  
 You **must not** generate any text responses or explanations.  
 You **must not** answer questions, provide reasoning, or engage in conversation.  

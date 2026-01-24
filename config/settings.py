@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from config.system_prompts import *
+from prompts.system_prompts import *
 
 
 class Mode(Enum):
@@ -15,21 +15,15 @@ class Mode(Enum):
 # Ollama Settings
 DEFAULT_HOST = "http://localhost:11434"
 
-DEFAULT_MODEL = "deepseek-r1:14b"
-CODE_MODEL = "deepcoder:14b"
-SHELL_MODEL = "qwen2.5-coder:7b"
-SYSTEM_MODEL = "mistral:7b"
+
+# Models
+DEFAULT_MODEL = "deepseek-r1:1.5b"
+CODE_MODEL = "deepseek-r1:1.5b"
+SHELL_MODEL = "deepseek-r1:1.5b"
+SYSTEM_MODEL = "deepseek-r1:1.5b"
 HELPER_MODEL = "deepseek-r1:1.5b"
-VISION_MODEL = "minicpm-v:8b"
+VISION_MODEL = "deepseek-r1:1.5b"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
-#
-# DEFAULT_MODEL = "deepseek-r1:1.5b"
-# CODE_MODEL = "deepseek-r1:1.5b"
-# SHELL_MODEL = "deepseek-r1:1.5b"
-# SYSTEM_MODEL = "deepseek-r1:1.5b"
-# HELPER_MODEL = "deepseek-r1:1.5b"
-# VISION_MODEL = "deepseek-r1:1.5b"
-# EMBEDDING_MODEL = "nomic-embed-text:latest"
 
 # Mapping Mode to Configuration
 MODE_CONFIGS = {
