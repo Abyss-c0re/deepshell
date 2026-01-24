@@ -3,7 +3,7 @@ import asyncio
 from ui.ui import ChatMode
 from ui.printer import printer
 from utils.logger import Logger
-from chatbot.helper import PromptHelper
+from prompts.helper import PromptHelper
 from chatbot.history import HistoryManager
 from typing import Optional, Any, Callable
 from chatbot.deployer import deploy_chatbot

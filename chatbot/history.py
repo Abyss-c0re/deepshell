@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime
 from utils.logger import Logger
 from typing import Tuple, Optional
-from chatbot.helper import PromptHelper
+from prompts.helper import PromptHelper
 from utils.file_utils import _read_file
 from ollama_client.api_client import OllamaClient
 from sklearn.metrics.pairwise import cosine_similarity
