@@ -1,4 +1,6 @@
 venv/
+prototyping/
+*.ipynb
 *.pyc
 **/*.pyc
 __pycache__/
@@ -10,4 +12,4 @@ deepshell.log
 .vscode/settings.json
 pyproject.toml
 amd_docker_run.sh
-prototype.ipynb
+
