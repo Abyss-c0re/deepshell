@@ -3,13 +3,13 @@ import re
 import asyncio
 import numpy as np
 from datetime import datetime
-from utils.logger import Logger
+from src.utils.logger import Logger
 from typing import Tuple, Optional
-from prompts.helper import PromptHelper
-from utils.file_utils import _read_file
-from ollama_client.api_client import OllamaClient
+from src.prompts.helper import PromptHelper
+from src.utils.file_utils import _read_file
+from src.ollama_client.api_client import OllamaClient
 from sklearn.metrics.pairwise import cosine_similarity
-from config.settings import OFF_THR, MSG_THR, CONT_THR, NUM_MSG, OFF_FREQ, SLICE_SIZE
+from src.config.settings import OFF_THR, MSG_THR, CONT_THR, NUM_MSG, OFF_FREQ, SLICE_SIZE
 
 logger = Logger.get_logger()
 

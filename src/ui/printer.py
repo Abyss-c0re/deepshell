@@ -1,5 +1,5 @@
 import asyncio
-from ui.rendering import Rendering
+from src.ui.rendering import Rendering
 
 
 def printer(content: str, system: bool = False) -> None:

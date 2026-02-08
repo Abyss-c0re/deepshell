@@ -1,11 +1,11 @@
 import os
 import re
-from ui.printer import printer
-from utils.logger import Logger
-from config.settings import Mode
+from src.ui.printer import printer
+from src.utils.logger import Logger
+from src.config.settings import Mode
 from typing import Optional, Tuple
-from utils.file_utils import FileUtils
-from utils.shell_utils import CommandExecutor
+from src.utils.file_utils import FileUtils
+from src.utils.shell_utils import CommandExecutor
 
 logger = Logger.get_logger()
 

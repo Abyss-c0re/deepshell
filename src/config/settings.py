@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from prompts.system_prompts import *
+from src.prompts.system_prompts import *
 
 
 class Mode(Enum):
@@ -16,13 +16,14 @@ class Mode(Enum):
 DEFAULT_HOST = "http://localhost:11434"
 
 
-# Models
-DEFAULT_MODEL = "deepseek-r1:1.5b"
-CODE_MODEL = "deepseek-r1:1.5b"
-SHELL_MODEL = "deepseek-r1:1.5b"
-SYSTEM_MODEL = "deepseek-r1:1.5b"
-HELPER_MODEL = "deepseek-r1:1.5b"
-VISION_MODEL = "deepseek-r1:1.5b"
+DEFAULT_MODEL = "huihui_ai/gemma3n-abliterated:e2b-fp16"
+CODE_MODEL = "huihui_ai/acereason-nemotron-abliterated:7b"
+SHELL_MODEL = "thirdeyeai/Qwen2.5-Coder-7B-Instruct-Uncensored:Q8_0"
+SYSTEM_MODEL = "huihui_ai/gemma3n-abliterated:e2b-fp16"
+FUNCTION_MODEL = "functiongemma"
+CYBERSEC_MODEL = "huihui_ai/foundation-sec-abliterated:8b"
+HELPER_MODEL = "nidumai/nidum-limitless-gemma-2b:Q4_K_M"
+VISION_MODEL = "minicpm-v:8b"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
 
 # Mapping Mode to Configuration

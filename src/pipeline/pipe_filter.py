@@ -1,7 +1,7 @@
 import re
-from ui.printer import printer
-from utils.logger import Logger
-from ollama_client.api_client import OllamaClient
+from src.ui.printer import printer
+from src.utils.logger import Logger
+from src.ollama_client.api_client import OllamaClient
 
 logger = Logger.get_logger()
 

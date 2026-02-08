@@ -3,9 +3,9 @@ import shlex
 import string
 import asyncio
 import secrets
-from ui.printer import printer
-from utils.logger import Logger
-from config.settings import (
+from src.ui.printer import printer
+from src.utils.logger import Logger
+from src.config.settings import (
     SHELL_TYPE,
     MONITOR_INTERVAL,
     MAX_OUTPUT_LINES,

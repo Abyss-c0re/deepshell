@@ -1,9 +1,9 @@
 import ollama
 import asyncio
 import numpy as np
-from utils.logger import Logger
+from src.utils.logger import Logger
 from typing import AsyncGenerator, Sequence, cast
-from config.settings import Mode, MODE_CONFIGS, EMBEDDING_MODEL, DEFAULT_HOST
+from src.config.settings import Mode, MODE_CONFIGS, EMBEDDING_MODEL, DEFAULT_HOST
 
 logger = Logger.get_logger()
 
@@ -158,25 +158,56 @@ class OllamaClient:
         """
         async with OllamaClient._global_lock:
             logger.info(f"{self.mode.name} is fetching response")
-            logger.info(functions)
+            logger.info(f"Available tools: {[f.get('function', {}).get('name', '<unnamed>') for f in functions]}")
 
             try:
                 message = {"role": "user", "content": input}
                 response = await self.client.chat(
-                    model=self.model, messages=[message], tools=functions
+                    model=self.model,
+                    messages=[message],
+                    tools=functions
                 )
-                logger.info(f"Full response: {response}")
-                if response.message.tool_calls:
-                    return response.message.tool_calls
 
+                # ─── Defensive logging & checks ──────────────────────────────────────
+                if response is None:
+                    logger.error("Ollama client.chat() returned None")
+                    return None
+
+                if not hasattr(response, 'message') or response.message is None:
+                    logger.error("response has no .message or .message is None")
+                    logger.debug(f"Full response object: {response!r}")
+                    return None
+
+                logger.debug(f"response.message.content = {getattr(response.message, 'content', None)}")
+
+                if not hasattr(response.message, 'tool_calls'):
+                    logger.warning("response.message has no .tool_calls attribute")
+                    return None
+
+                tool_calls = response.message.tool_calls
+
+                if tool_calls is None:
+                    logger.info("tool_calls is explicitly None → treating as no tool call")
+                    return None
+
+                if tool_calls:  # now safe
+                    logger.info("═══════════════════════════════════════════════")
+                    logger.info("OLLAMA CALLED TOOL(S):")
+                    for i, tc in enumerate(tool_calls, 1):
+                        name = getattr(tc.function, 'name', '<no name>')
+                        args = getattr(tc.function, 'arguments', {})
+                        logger.info(f"  ┌─ Tool #{i}")
+                        logger.info(f"  │  name      : {name}")
+                        logger.info(f"  │  arguments : {args}")
+                        logger.info("  └──────────────────────────────────────")
+                    return tool_calls
                 else:
-                    logger.info("No functions have been called")
+                    logger.info("No tool calls were made")
                     return None
 
             except Exception as e:
-                logger.error(f"Error fetching response: {e}")
-                return "Error fetching response"
-
+                logger.error(f"Error in _call_function: {e}", exc_info=True)
+                return None   # ← better than returning string "Error…"
     @staticmethod
     async def fetch_embedding(text: str) -> np.ndarray | None:
         """

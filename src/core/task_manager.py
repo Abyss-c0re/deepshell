@@ -2,7 +2,7 @@ import asyncio
 import time
 import inspect
 from typing import Any, Callable
-from utils.logger import Logger
+from src.utils.logger import Logger
 
 logger = Logger.get_logger()
 

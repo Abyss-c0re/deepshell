@@ -1,15 +1,15 @@
 import sys
 import asyncio
-from ui.ui import ChatMode
-from ui.printer import printer
-from utils.logger import Logger
-from prompts.helper import PromptHelper
-from chatbot.history import HistoryManager
+from src.ui.ui import ChatMode
+from src.ui.printer import printer
+from src.utils.logger import Logger
+from src.prompts.helper import PromptHelper
+from src.chatbot.history import HistoryManager
 from typing import Optional, Any, Callable
-from chatbot.deployer import deploy_chatbot
-from config.settings import Mode, PROCESS_IMAGES
-from utils.command_processor import CommandProcessor
-from core.task_manager import TaskManager
+from src.chatbot.deployer import deploy_chatbot
+from src.config.settings import Mode, PROCESS_IMAGES
+from src.utils.command_processor import CommandProcessor
+from src.core.task_manager import TaskManager
 
 
 logger = Logger.get_logger()

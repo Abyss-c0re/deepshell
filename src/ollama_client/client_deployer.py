@@ -1,7 +1,7 @@
 import sys
-from config.settings import *
-from utils.args_utils import parse_args
-from ollama_client.api_client import OllamaClient
+from src.config.settings import *
+from src.utils.args_utils import parse_args
+from src.ollama_client.api_client import OllamaClient
 
 
 class ClientDeployer:

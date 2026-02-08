@@ -1,9 +1,9 @@
 from typing import Tuple
-from utils.logger import Logger
-from config.settings import Mode
-from pipeline.pipe_filter import PipeFilter
-from ollama_client.api_client import OllamaClient
-from ollama_client.client_deployer import ClientDeployer
+from src.utils.logger import Logger
+from src.config.settings import Mode
+from src.pipeline.pipe_filter import PipeFilter
+from src.ollama_client.api_client import OllamaClient
+from src.ollama_client.client_deployer import ClientDeployer
 
 logger = Logger.get_logger()
 

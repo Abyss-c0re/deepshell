@@ -1,7 +1,7 @@
 import sys
 import asyncio
 from textual import events
-from ui.rendering import Rendering
+from src.ui.rendering import Rendering
 from textual.containers import Vertical
 from textual.widgets import Input, RichLog
 from textual.app import App, ComposeResult

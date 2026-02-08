@@ -1,6 +1,6 @@
 import logging
-from ui.printer import printer
-from config.settings import LOG, LOG_LEVEL, LOG_TO_FILE, LOG_TO_UI
+from src.ui.printer import printer
+from src.config.settings import LOG, LOG_LEVEL, LOG_TO_FILE, LOG_TO_UI
 
 
 class Logger:

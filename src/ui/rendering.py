@@ -1,6 +1,6 @@
 import re
 import asyncio
-from config.settings import RENDER_DELAY
+from src.config.settings import RENDER_DELAY
 
 
 class Rendering:

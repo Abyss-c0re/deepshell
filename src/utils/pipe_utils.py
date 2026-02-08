@@ -1,7 +1,7 @@
 import sys
 import asyncio
 from typing import Optional
-from utils.logger import Logger
+from src.utils.logger import Logger
 
 logger = Logger.get_logger()
 

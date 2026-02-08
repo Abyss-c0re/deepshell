@@ -6,11 +6,11 @@ import aiofiles
 from PIL import Image
 from io import BytesIO
 from typing import Callable
-from ui.printer import printer
-from utils.logger import Logger
+from src.ui.printer import printer
+from src.utils.logger import Logger
 
-from ui.popups import RadiolistPopup
-from config.settings import (
+from src.ui.popups import RadiolistPopup
+from src.config.settings import (
     IGNORE_DOT_FILES,
     SUPPORTED_EXTENSIONS,
     IGNORED_FOLDERS,

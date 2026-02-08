@@ -2,8 +2,8 @@ import os
 import ast
 import ollama
 import subprocess
-from utils.logger import Logger
-from config.settings import DEFAULT_HOST
+from src.utils.logger import Logger
+from src.config.settings import DEFAULT_HOST
 
 
 logger = Logger.get_logger()
