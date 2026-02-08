@@ -1,10 +1,10 @@
 import sys
 import asyncio
-from utils.pipe_utils import PipeUtils
-from utils.args_utils import parse_args
-from chatbot.manager import ChatManager
-from ollama_client.validator import validate_install
-from utils.symlink_utils import create_symlink, remove_symlink
+from src.utils.pipe_utils import PipeUtils
+from src.utils.args_utils import parse_args
+from src.chatbot.manager import ChatManager
+from src.ollama_client.validator import validate_install
+from src.utils.symlink_utils import create_symlink, remove_symlink
 
 
 async def async_main():
