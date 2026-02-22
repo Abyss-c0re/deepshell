@@ -7,7 +7,7 @@ from src.utils.logger import Logger
 logger = Logger.get_logger()
 
 
-class TaskManager:
+class TaskDeployer:
     """
     Handles queued async execution of heavy chatbot tasks.
     """

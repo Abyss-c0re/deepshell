@@ -30,5 +30,5 @@ class PipeUtils:
                 user_input = self.processor.format_input(user_input, pipe_input)
             else:
                 user_input = pipe_input
-        results = await self.chat_manager.task_manager(user_input)
+        results = await self.chat_manager.task_deployer(user_input)
         print(results)

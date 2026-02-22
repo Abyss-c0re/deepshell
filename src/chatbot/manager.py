@@ -9,7 +9,7 @@ from typing import Optional, Any, Callable
 from src.chatbot.deployer import deploy_chatbot
 from src.config.settings import Mode, PROCESS_IMAGES
 from src.utils.command_processor import CommandProcessor
-from src.core.task_manager import TaskManager
+from src.core.task_deployer import TaskDeployer
 
 
 logger = Logger.get_logger()
@@ -18,7 +18,7 @@ logger = Logger.get_logger()
 class ChatManager:
     """
     Orchestrates chatbot execution, UI interaction, command handling,
-    and delegates heavy async work to TaskManager.
+    and delegates heavy async work to TaskDeployer.
     """
 
     def __init__(self):
@@ -36,7 +36,7 @@ class ChatManager:
 
         self.tasks: list[asyncio.Task] = []
 
-        self.task_executor = TaskManager()
+        self.task_executor = TaskDeployer()
 
     async def init(self):
         """Initialize history, UI helpers, and background services."""
@@ -110,7 +110,7 @@ class ChatManager:
         logger.info("Executing task manager.")
 
         if action or self.client.mode != Mode.DEFAULT:
-            response = await self.task_manager(
+            response = await self.task_deployer(
                 user_input=user_input,
                 action=action,
             )
@@ -120,11 +120,11 @@ class ChatManager:
 
         if not sys.stdout.isatty():
             logger.info("Non-interactive stdout detected")
-            return await self.task_manager(user_input=user_input)
+            return await self.task_deployer(user_input=user_input)
 
         if self.client.keep_history and self.client.mode != Mode.SHELL and not response:
             history = await self.generate_prompt(user_input)
-            response = await self.task_manager(history=history)
+            response = await self.task_deployer(history=history)
 
         # --------------------------------------------------
         # History & mode restoration
@@ -154,7 +154,7 @@ class ChatManager:
     # Task routing
     # ------------------------------------------------------------------
 
-    async def task_manager(
+    async def task_deployer(
         self,
         user_input: str = "",
         history: Optional[list] = None,
