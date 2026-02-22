@@ -1,7 +1,7 @@
-aiofiles==24.1.0
-numpy==2.2.4
-ollama==0.4.7
-Pillow==11.1.0
-python_magic==0.4.27
-scikit_learn==1.6.1
-textual==2.1.2
+aiofiles
+numpy
+ollama
+Pillow
+python_magic
+scikit_learn
+textual
