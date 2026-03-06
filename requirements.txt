@@ -1,6 +1,6 @@
 aiofiles
 numpy
-ollama
+openai
 Pillow
 python_magic
 scikit_learn

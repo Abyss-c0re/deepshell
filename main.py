@@ -3,7 +3,6 @@ import asyncio
 from src.utils.pipe_utils import PipeUtils
 from src.utils.args_utils import parse_args
 from src.chatbot.manager import ChatManager
-from src.ollama_client.validator import validate_install
 from src.utils.symlink_utils import create_symlink, remove_symlink
 
 
@@ -16,31 +15,31 @@ async def async_main():
     if args.uninstall:
         remove_symlink()
         return
-    if validate_install():
-        chat_manager = ChatManager()
-        pipe_utils = PipeUtils(chat_manager)
+    
+    chat_manager = ChatManager()
+    pipe_utils = PipeUtils(chat_manager)
 
-        user_input = args.prompt or args.string_input or ""
-        file = args.file or ""
-        pipe_content = ""
-        stdin_piped = not sys.stdin.isatty()
-        stdout_piped = not sys.stdout.isatty()
+    user_input = args.prompt or args.string_input or ""
+    file = args.file or ""
+    pipe_content = ""
+    stdin_piped = not sys.stdin.isatty()
+    stdout_piped = not sys.stdout.isatty()
 
-        if stdin_piped:
-            pipe_content = await pipe_utils.read_pipe()
-        if stdout_piped:
-            chat_manager.ui = None
-            response = await chat_manager.deploy_task(user_input, file, pipe_content)
-            print(response)
-        else:
-            if chat_manager.ui:
-                (
-                    chat_manager.ui.user_input,
-                    chat_manager.ui.file,
-                    chat_manager.ui.file_content,
-                ) = user_input, file, pipe_content
+    if stdin_piped:
+        pipe_content = await pipe_utils.read_pipe()
+    if stdout_piped:
+        chat_manager.ui = None
+        response = await chat_manager.deploy_task(user_input, file, pipe_content)
+        print(response)
+    else:
+        if chat_manager.ui:
+            (
+                chat_manager.ui.user_input,
+                chat_manager.ui.file,
+                chat_manager.ui.file_content,
+            ) = user_input, file, pipe_content
 
-                await chat_manager.ui.run_async()
+            await chat_manager.ui.run_async()
 
 
 if __name__ == "__main__":

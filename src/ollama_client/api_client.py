@@ -1,8 +1,8 @@
-import ollama
+import openai
 import asyncio
 import numpy as np
 from src.utils.logger import Logger
-from typing import AsyncGenerator, Sequence, cast
+from typing import Sequence
 from src.config.settings import Mode, MODE_CONFIGS, EMBEDDING_MODEL, DEFAULT_HOST
 
 logger = Logger.get_logger()
@@ -23,7 +23,7 @@ class OllamaClient:
         show_thinking: bool = False,
     ):
         logger.info("Initializing OllamaClient")
-        self.client = ollama.AsyncClient(host=host)
+        self.client = openai.AsyncOpenAI(base_url=host + "/v1", api_key="sk-no-key-required")
         self.model = model
         self.config = config
         self.mode = mode
@@ -65,33 +65,32 @@ class OllamaClient:
 
     async def _chat_stream(self, input=None, history=None) -> None:
         """
-        Fetches response from the Ollama API and streams into output buffer.
+        Fetches response from the llama.cpp API and streams into output buffer.
         """
         async with OllamaClient._global_lock:
             logger.info(f"{self.mode.name} started stream")
 
             if history:
-                input = history
+                messages = history
             else:
-                input = [{"role": "user", "content": input}]
+                messages = [
+                    {"role": "system", "content": self.config["system"]},
+                    {"role": "user", "content": input}
+                ]
 
-            logger.debug(f"Chat request payload: {input}")
+            logger.debug(f"Chat request payload: {messages}")
 
             try:
-                # Force-cast the response to an AsyncGenerator
-                response = cast(
-                    AsyncGenerator[dict, None],
-                    await self.client.chat(
-                        model=self.model,
-                        messages=input,
-                        options=self.config,
-                        stream=self.stream,
-                    ),
+                response = await self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    temperature=self.config["temperature"],
+                    stream=self.stream,
                 )
 
                 async for part in response:
                     if not self.pause_stream:
-                        content = part.get("message", {}).get("content", "")
+                        content = part.choices[0].delta.content or ""
                         await self.output_buffer.put(content)
 
                 if not self.pause_stream:
@@ -116,11 +115,29 @@ class OllamaClient:
 
             if self.mode == Mode.VISION:
                 try:
-                    response = await self.client.generate(
-                        model=self.model, prompt=prompt, images=[image]
+                    messages = [
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": prompt},
+                                {
+                                    "type": "image_url",
+                                    "image_url": {"url": f"data:image/jpeg;base64,{image}"},
+                                },
+                            ],
+                        }
+                    ]
+                    temp_client = openai.AsyncOpenAI(
+                        base_url= "http://localhost:1313" + "/v1",
+                        api_key="sk-no-key-required"
+                    )
+                    response = await temp_client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        temperature=self.config.get("temperature", 0.7),
                     )
                     logger.debug(f"Image description response: {response}")
-                    message_data = response.response
+                    message_data = response.choices[0].message.content
 
                     if message_data:
                         return message_data
@@ -134,23 +151,42 @@ class OllamaClient:
 
     async def _fetch_response(self, input: str) -> str:
         """
-        Fetches a complete response from the model.
+        Fetches a complete response from a chat-style model.
+        Compatible with Ollama / llama2 models.
         """
-        async with OllamaClient._global_lock:
-            logger.info(f"{self.mode.name} is fetching response")
+        try:
+            # Prepare messages for chat
+            messages = [
+                {"role": "system", "content": self.config.get("system", "")},
+                {"role": "user", "content": input}
+            ]
 
-            try:
-                response = await self.client.generate(model=self.model, prompt=input)
-                logger.info("Response received successfully")
-                message_data = response.response
-                if not message_data:
-                    logger.warning("No message found in response")
-                    return "No message in response"
+            logger.info(f"Fetching response from model {self.model}")
 
-                return message_data
-            except Exception as e:
-                logger.error(f"Error fetching response: {e}")
-                return "Error fetching response"
+            # Call chat completion API (async)
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=self.config.get("temperature", 0.7),
+                stream=False  # Ensure no streaming, we want a single complete response
+            )
+
+            # Defensive logging
+            logger.debug(f"Full response object: {response!r}")
+
+            # Extract the message content
+            message_data = getattr(response.choices[0].message, "content", None)
+
+            if not message_data:
+                logger.warning("No message content found in response")
+                return "No message in response"
+
+            logger.info("Response received successfully")
+            return message_data
+
+        except Exception as e:
+            logger.error(f"Error fetching response: {e}", exc_info=True)
+            return "Error fetching response"
 
     async def _call_function(self, input: str, functions: list = []) -> Sequence | None:
         """
@@ -161,30 +197,29 @@ class OllamaClient:
             logger.info(f"Available tools: {[f.get('function', {}).get('name', '<unnamed>') for f in functions]}")
 
             try:
-                message = {"role": "user", "content": input}
-                response = await self.client.chat(
+                messages = [
+                    {"role": "system", "content": self.config["system"]},
+                    {"role": "user", "content": input}
+                ]
+                response = await self.client.chat.completions.create(
                     model=self.model,
-                    messages=[message],
+                    messages=messages,
                     tools=functions
                 )
 
                 # ─── Defensive logging & checks ──────────────────────────────────────
                 if response is None:
-                    logger.error("Ollama client.chat() returned None")
+                    logger.error("Client.chat.completions.create() returned None")
                     return None
 
-                if not hasattr(response, 'message') or response.message is None:
-                    logger.error("response has no .message or .message is None")
+                if not response.choices or not response.choices[0].message:
+                    logger.error("No choices or message in response")
                     logger.debug(f"Full response object: {response!r}")
                     return None
 
-                logger.debug(f"response.message.content = {getattr(response.message, 'content', None)}")
+                logger.debug(f"response.choices[0].message.content = {response.choices[0].message.content}")
 
-                if not hasattr(response.message, 'tool_calls'):
-                    logger.warning("response.message has no .tool_calls attribute")
-                    return None
-
-                tool_calls = response.message.tool_calls
+                tool_calls = response.choices[0].message.tool_calls
 
                 if tool_calls is None:
                     logger.info("tool_calls is explicitly None → treating as no tool call")
@@ -192,10 +227,10 @@ class OllamaClient:
 
                 if tool_calls:  # now safe
                     logger.info("═══════════════════════════════════════════════")
-                    logger.info("OLLAMA CALLED TOOL(S):")
+                    logger.info("LLAMA.CPP CALLED TOOL(S):")
                     for i, tc in enumerate(tool_calls, 1):
-                        name = getattr(tc.function, 'name', '<no name>')
-                        args = getattr(tc.function, 'arguments', {})
+                        name = tc.function.name
+                        args = tc.function.arguments
                         logger.info(f"  ┌─ Tool #{i}")
                         logger.info(f"  │  name      : {name}")
                         logger.info(f"  │  arguments : {args}")
@@ -208,6 +243,7 @@ class OllamaClient:
             except Exception as e:
                 logger.error(f"Error in _call_function: {e}", exc_info=True)
                 return None   # ← better than returning string "Error…"
+
     @staticmethod
     async def fetch_embedding(text: str) -> np.ndarray | None:
         """
@@ -215,14 +251,14 @@ class OllamaClient:
         that no other locked operation (such as streaming) runs concurrently.
         """
         async with OllamaClient._global_lock:
-            client = ollama.Client(host=DEFAULT_HOST)
+            client = openai.OpenAI(base_url=DEFAULT_HOST + "/v1", api_key="sk-no-key-required")
             try:
                 logger.info("Fetching embedding")
                 # Offload blocking work to a thread if needed
                 response = await asyncio.to_thread(
-                    client.embeddings, model=EMBEDDING_MODEL, prompt=text
+                    client.embeddings.create, model=EMBEDDING_MODEL, input=text
                 )
-                embedding = response["embedding"]
+                embedding = response.data[0].embedding
                 logger.debug(f"Extracted {len(embedding)} embeddings")
                 return embedding
             except Exception as e:

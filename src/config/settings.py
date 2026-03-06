@@ -13,18 +13,17 @@ class Mode(Enum):
 
 
 # Ollama Settings
-DEFAULT_HOST = "http://localhost:11434"
+DEFAULT_HOST = "http://localhost:1212"
 
 
-DEFAULT_MODEL = "huihui_ai/gemma3n-abliterated:e2b-fp16"
-CODE_MODEL = "huihui_ai/acereason-nemotron-abliterated:7b"
-SHELL_MODEL = "thirdeyeai/Qwen2.5-Coder-7B-Instruct-Uncensored:Q8_0"
-SYSTEM_MODEL = "huihui_ai/gemma3n-abliterated:e2b-fp16"
-FUNCTION_MODEL = "functiongemma"
-CYBERSEC_MODEL = "huihui_ai/foundation-sec-abliterated:8b"
-HELPER_MODEL = "nidumai/nidum-limitless-gemma-2b:Q4_K_M"
-VISION_MODEL = "minicpm-v:8b"
-EMBEDDING_MODEL = "nomic-embed-text:latest"
+DEFAULT_MODEL = "Qwen3.5-9B-Q4_K_M"
+CODE_MODEL = DEFAULT_MODEL
+SHELL_MODEL = DEFAULT_MODEL
+SYSTEM_MODEL = DEFAULT_MODEL
+FUNCTION_MODEL = "Qwen3-4B-Function-Calling-Pro"
+HELPER_MODEL = DEFAULT_MODEL
+VISION_MODEL = "Qwen3-VL-4B-Instruct-UD-Q6_K_XL"
+EMBEDDING_MODEL = "embeddinggemma-300m-qat-Q8_0"
 
 # Mapping Mode to Configuration
 MODE_CONFIGS = {
@@ -38,7 +37,7 @@ MODE_CONFIGS = {
 
 # Logging
 LOG = True
-LOG_LEVEL = "warning"  # Possible values: debug, info, warning, error, critical
+LOG_LEVEL = "info"  # Possible values: debug, info, warning, error, critical
 LOG_TO_FILE = False
 LOG_TO_UI = True
 
@@ -62,7 +61,7 @@ FINALIZE_OUTPUT = True  # Output post-processing such as trimming
 MAX_OUTPUT_LINES = 30000
 
 # FileProcessing Config
-PROCESS_IMAGES = False  # Turn this on if you want to get a description of the images
+PROCESS_IMAGES = True  # Turn this on if you want to get a description of the images
 IMG_INPUT_RES = (512, 512)
 
 IGNORE_DOT_FILES = False
