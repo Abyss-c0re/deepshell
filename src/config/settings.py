@@ -16,14 +16,14 @@ class Mode(Enum):
 DEFAULT_HOST = "http://localhost:1212"
 
 
-DEFAULT_MODEL = "Qwen3.5-9B-Q4_K_M"
+DEFAULT_MODEL = "qwen3.5-9b"
 CODE_MODEL = DEFAULT_MODEL
 SHELL_MODEL = DEFAULT_MODEL
 SYSTEM_MODEL = DEFAULT_MODEL
-FUNCTION_MODEL = "Qwen3-4B-Function-Calling-Pro"
+FUNCTION_MODEL = "qwen3-4b-fc-pro"
 HELPER_MODEL = DEFAULT_MODEL
-VISION_MODEL = "Qwen3-VL-4B-Instruct-UD-Q6_K_XL"
-EMBEDDING_MODEL = "embeddinggemma-300m-qat-Q8_0"
+VISION_MODEL = "qwen3.5-9b"
+EMBEDDING_MODEL = "embedding-gemma-300m"
 
 # Mapping Mode to Configuration
 MODE_CONFIGS = {
