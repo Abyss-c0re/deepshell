@@ -1,13 +1,13 @@
 import re
 from src.ui.printer import printer
 from src.utils.logger import Logger
-from src.ollama_client.api_client import OllamaClient
+from src.ollama_client.api_client import LLMClient
 
 logger = Logger.get_logger()
 
 
 class PipeFilter:
-    def __init__(self, ollama_client: OllamaClient):
+    def __init__(self, ollama_client: LLMClient):
         self.ollama_client = ollama_client
         self.input_buffer = ollama_client.output_buffer
         self.formatting = ollama_client.render_output

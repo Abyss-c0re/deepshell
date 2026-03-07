@@ -1,7 +1,7 @@
 import sys
 from src.config.settings import *
 from src.utils.args_utils import parse_args
-from src.ollama_client.api_client import OllamaClient
+from src.ollama_client.api_client import LLMClient
 
 
 class ClientDeployer:
@@ -29,7 +29,7 @@ class ClientDeployer:
         self.config = self.generate_config(temp=config["temp"], prompt=config["prompt"])
         self.stream = config["stream"]
 
-    def deploy(self) -> OllamaClient:
+    def deploy(self) -> LLMClient:
         """
         Deploys an isntance of Ollama API Client
         """
@@ -39,7 +39,7 @@ class ClientDeployer:
         if self.args.model:
             self.model = self.args.model
 
-        return OllamaClient(
+        return LLMClient(
             host=self.host,
             model=self.model,
             config=self.config,

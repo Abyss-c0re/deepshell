@@ -8,7 +8,7 @@ from src.config.settings import Mode, MODE_CONFIGS, EMBEDDING_MODEL, DEFAULT_HOS
 logger = Logger.get_logger()
 
 
-class OllamaClient:
+class LLMClient:
     # Class-level lock to ensure critical async functions do not run concurrently
     _global_lock = asyncio.Lock()
 
@@ -22,7 +22,7 @@ class OllamaClient:
         render_output: bool = True,
         show_thinking: bool = False,
     ):
-        logger.info("Initializing OllamaClient")
+        logger.info("Initializing LLMClient")
         self.client = openai.AsyncOpenAI(base_url=host + "/v1", api_key="sk-no-key-required")
         self.model = model
         self.config = config
@@ -67,7 +67,7 @@ class OllamaClient:
         """
         Fetches response from the llama.cpp API and streams into output buffer.
         """
-        async with OllamaClient._global_lock:
+        async with LLMClient._global_lock:
             logger.info(f"{self.mode.name} started stream")
 
             if history:
@@ -106,7 +106,7 @@ class OllamaClient:
         """
         Describes an image using the vision model.
         """
-        async with OllamaClient._global_lock:
+        async with LLMClient._global_lock:
             logger.info(f"{self.mode.name} describing image")
 
             if not image:
@@ -192,7 +192,7 @@ class OllamaClient:
         """
         Fetches a complete response from the model.
         """
-        async with OllamaClient._global_lock:
+        async with LLMClient._global_lock:
             logger.info(f"{self.mode.name} is fetching response")
             logger.info(f"Available tools: {[f.get('function', {}).get('name', '<unnamed>') for f in functions]}")
 
@@ -250,7 +250,7 @@ class OllamaClient:
         Asynchronously fetches and caches an embedding for the given text while ensuring
         that no other locked operation (such as streaming) runs concurrently.
         """
-        async with OllamaClient._global_lock:
+        async with LLMClient._global_lock:
             client = openai.OpenAI(base_url=DEFAULT_HOST + "/v1", api_key="sk-no-key-required")
             try:
                 logger.info("Fetching embedding")
