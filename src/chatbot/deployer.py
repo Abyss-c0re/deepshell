@@ -2,8 +2,8 @@ from typing import Tuple
 from src.utils.logger import Logger
 from src.config.settings import Mode
 from src.pipeline.pipe_filter import PipeFilter
-from src.ollama_client.api_client import LLMClient
-from src.ollama_client.client_deployer import ClientDeployer
+from src.client.api_client import LLMClient
+from src.client.client_deployer import ClientDeployer
 
 logger = Logger.get_logger()
 

@@ -1,7 +1,7 @@
 import sys
 from src.config.settings import *
 from src.utils.args_utils import parse_args
-from src.ollama_client.api_client import LLMClient
+from src.client.api_client import LLMClient
 
 
 class ClientDeployer:

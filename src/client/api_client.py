@@ -27,14 +27,14 @@ class LLMClient:
         self.model = model
         self.config = config
         self.mode = mode
-        self.stream = stream
+        self.stream = stream #probably remove
 
-        self.pause_stream = False
+        self.pause_stream = False #Move to UI
         self.output_buffer = asyncio.Queue()
-        self.render_output = render_output
+        self.render_output = render_output #Move to UI
 
-        self.show_thinking = show_thinking
-        self.thoughts = []
+        self.show_thinking = show_thinking # Move to UI
+        self.thoughts = [] # To agent
 
         self.last_response = ""
 

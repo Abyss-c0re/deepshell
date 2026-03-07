@@ -1,16 +1,16 @@
 import re
 from src.ui.printer import printer
 from src.utils.logger import Logger
-from src.ollama_client.api_client import LLMClient
+from src.client.api_client import LLMClient
 
 logger = Logger.get_logger()
 
 
 class PipeFilter:
-    def __init__(self, ollama_client: LLMClient):
-        self.ollama_client = ollama_client
-        self.input_buffer = ollama_client.output_buffer
-        self.formatting = ollama_client.render_output
+    def __init__(self, client: LLMClient):
+        self.client = client
+        self.input_buffer = client.output_buffer
+        self.formatting = client.render_output
         self.extracted_code = None
 
     async def process_stream(
@@ -29,7 +29,7 @@ class PipeFilter:
                     break
                 full_input += message
 
-            self.ollama_client.last_response = full_input
+            self.client.last_response = full_input
             self.extracted_code = await self.extract_code(response=full_input)
             logger.debug(f"Extracted code: {self.extracted_code}")
             return
@@ -56,7 +56,7 @@ class PipeFilter:
                 elif chunk[i:].startswith("</think>"):
                     thinking = False
                     i += 8
-                    if self.ollama_client.show_thinking:
+                    if self.client.show_thinking:
                         output += "\n[blue]Final answer:[/] "
                     continue
 
@@ -64,7 +64,7 @@ class PipeFilter:
 
                 if thinking:
                     thought_buffer.append(char)
-                    if self.ollama_client.show_thinking:
+                    if self.client.show_thinking:
                         output += char
                 else:
                     output += char
@@ -91,8 +91,8 @@ class PipeFilter:
         if accumulated_line.strip() and render:
             printer(accumulated_line)
 
-        self.ollama_client.last_response = results
-        self.ollama_client.thoughts = thought_buffer
+        self.client.last_response = results
+        self.client.thoughts = thought_buffer
         logger.debug(f"PipeFilter output: {results} \nThoughts: {thought_buffer}")
 
     async def process_static(self, text: str, extract_code: bool = False) -> str:
@@ -100,7 +100,7 @@ class PipeFilter:
         Processes a static string, handling thoughts and code differently based on config.
         """
         if extract_code:
-            self.ollama_client.last_response = text
+            self.client.last_response = text
             self.extracted_code = await self.extract_code(response=text)
 
             if self.extracted_code:
@@ -116,8 +116,8 @@ class PipeFilter:
         filtered_lines = [pattern.sub("", line) for line in filtered_text.splitlines()]
         filtered_text = "\n".join(filtered_lines)
 
-        self.ollama_client.last_response = filtered_text
-        self.ollama_client.thoughts.append(thoughts)
+        self.client.last_response = filtered_text
+        self.client.thoughts.append(thoughts)
 
         logger.debug(f"Filtered text: {filtered_text} \nThoughts: {thoughts}")
         return filtered_text

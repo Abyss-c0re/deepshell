@@ -7,7 +7,7 @@ from src.utils.logger import Logger
 from typing import Tuple, Optional
 from src.prompts.helper import PromptHelper
 from src.utils.file_utils import _read_file
-from src.ollama_client.api_client import LLMClient
+from src.client.api_client import LLMClient
 from sklearn.metrics.pairwise import cosine_similarity
 from src.config.settings import OFF_THR, MSG_THR, CONT_THR, NUM_MSG, OFF_FREQ, SLICE_SIZE
 
