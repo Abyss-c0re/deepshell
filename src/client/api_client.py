@@ -145,7 +145,7 @@ class LLMClient:
                 ]
 
             token_count = count_message_tokens(messages)
-            logger.debug(f"Total tokens in _chat_stream request: {token_count}")
+            logger.info(f"Total tokens in _chat_stream request: {token_count}")
 
             logger.debug(f"Chat request payload: {messages}")
 
@@ -198,7 +198,7 @@ class LLMClient:
                     ]
 
                     token_count = count_message_tokens(messages)
-                    logger.debug(f"Total tokens in _describe_image request: {token_count}")
+                    logger.info(f"Total tokens in _describe_image request: {token_count}")
 
                     temp_client = openai.AsyncOpenAI(
                         base_url= "http://localhost:1313" + "/v1",
@@ -235,7 +235,7 @@ class LLMClient:
             ]
 
             token_count = count_message_tokens(messages)
-            logger.debug(f"Total tokens in _fetch_response request: {token_count}")
+            logger.info(f"Total tokens in _fetch_response request: {token_count}")
 
             logger.info(f"Fetching response from model {self.model}")
 
@@ -341,7 +341,7 @@ class LLMClient:
                 logger.info(f"Fetching embedding | input chars: {len(text)}")
 
                 if not text.strip():
-                    logger.debug("Empty input → returning None")
+                    logger.info("Empty input → returning None")
                     return None
 
                 # Split into chunks if necessary
