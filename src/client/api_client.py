@@ -1,11 +1,77 @@
 import openai
 import asyncio
 import numpy as np
+import tiktoken
+from typing import List, Optional
 from src.utils.logger import Logger
 from typing import Sequence
 from src.config.settings import Mode, MODE_CONFIGS, EMBEDDING_MODEL, DEFAULT_HOST
 
 logger = Logger.get_logger()
+
+MAX_CHUNK_TOKENS = 900          # safety margin below 1024
+OVERLAP_TOKENS   = 100
+
+# Rough tokenizer - cl100k_base is usually close enough for modern models
+_tokenizer = tiktoken.get_encoding("cl100k_base")
+
+def split_text_into_chunks(
+    text: str,
+    max_tokens: int = MAX_CHUNK_TOKENS,
+    overlap: int = OVERLAP_TOKENS
+) -> List[str]:
+    """Split text into overlapping chunks that fit within max_tokens."""
+    if not text.strip():
+        return []
+
+    tokens = _tokenizer.encode(text, allowed_special="all")
+    if len(tokens) <= max_tokens:
+        return [text]
+
+    chunks = []
+    start_idx = 0
+
+    while start_idx < len(tokens):
+        end_idx = min(start_idx + max_tokens, len(tokens))
+        chunk_tokens = tokens[start_idx:end_idx]
+        chunk_text = _tokenizer.decode(chunk_tokens)
+        chunks.append(chunk_text)
+        start_idx += max_tokens - overlap
+
+    return chunks
+
+
+async def embed_single_chunk(
+    client: openai.OpenAI,
+    chunk: str,
+    model: str
+) -> Optional[np.ndarray]:
+    """Low-level embedding of one piece of text."""
+    try:
+        response = await asyncio.to_thread(
+            client.embeddings.create,
+            model=model,
+            input=chunk.strip()
+        )
+        vec = response.data[0].embedding
+        return np.array(vec, dtype=np.float32)
+    except Exception as e:
+        logger.error(f"Embedding chunk failed: {str(e)[:180]}...")
+        return None
+
+
+def count_message_tokens(messages: List[dict]) -> int:
+    """Approximate token count for a list of messages."""
+    total = 0
+    for msg in messages:
+        content = msg.get("content", "")
+        if isinstance(content, str):
+            total += len(_tokenizer.encode(content))
+        elif isinstance(content, list):
+            for item in content:
+                if item.get("type") == "text":
+                    total += len(_tokenizer.encode(item.get("text", "")))
+    return total  # Approximate, ignores role tokens etc.
 
 
 class LLMClient:
@@ -78,6 +144,9 @@ class LLMClient:
                     {"role": "user", "content": input}
                 ]
 
+            token_count = count_message_tokens(messages)
+            logger.debug(f"Total tokens in _chat_stream request: {token_count}")
+
             logger.debug(f"Chat request payload: {messages}")
 
             try:
@@ -127,6 +196,10 @@ class LLMClient:
                             ],
                         }
                     ]
+
+                    token_count = count_message_tokens(messages)
+                    logger.debug(f"Total tokens in _describe_image request: {token_count}")
+
                     temp_client = openai.AsyncOpenAI(
                         base_url= "http://localhost:1313" + "/v1",
                         api_key="sk-no-key-required"
@@ -160,6 +233,9 @@ class LLMClient:
                 {"role": "system", "content": self.config.get("system", "")},
                 {"role": "user", "content": input}
             ]
+
+            token_count = count_message_tokens(messages)
+            logger.debug(f"Total tokens in _fetch_response request: {token_count}")
 
             logger.info(f"Fetching response from model {self.model}")
 
@@ -201,6 +277,10 @@ class LLMClient:
                     {"role": "system", "content": self.config["system"]},
                     {"role": "user", "content": input}
                 ]
+
+                token_count = count_message_tokens(messages)
+                logger.debug(f"Total tokens in _call_function request: {token_count}")
+
                 response = await self.client.chat.completions.create(
                     model=self.model,
                     messages=messages,
@@ -247,22 +327,57 @@ class LLMClient:
     @staticmethod
     async def fetch_embedding(text: str) -> np.ndarray | None:
         """
-        Asynchronously fetches and caches an embedding for the given text while ensuring
-        that no other locked operation (such as streaming) runs concurrently.
+        Asynchronously fetches and caches an embedding for the given text.
+        Automatically chunks long inputs and averages the results.
+        Returns plain list[float] to stay compatible with original behavior.
         """
         async with LLMClient._global_lock:
-            client = openai.OpenAI(base_url=DEFAULT_HOST + "/v1", api_key="sk-no-key-required")
+            client = openai.OpenAI(
+                base_url=DEFAULT_HOST + "/v1",
+                api_key="sk-no-key-required"
+            )
+
             try:
-                logger.info("Fetching embedding")
-                # Offload blocking work to a thread if needed
-                response = await asyncio.to_thread(
-                    client.embeddings.create, model=EMBEDDING_MODEL, input=text
-                )
-                embedding = response.data[0].embedding
-                logger.debug(f"Extracted {len(embedding)} embeddings")
-                return embedding
+                logger.info(f"Fetching embedding | input chars: {len(text)}")
+
+                if not text.strip():
+                    logger.debug("Empty input → returning None")
+                    return None
+
+                # Split into chunks if necessary
+                chunks = split_text_into_chunks(text)
+                logger.debug(f"Processing {len(chunks)} chunk(s)")
+
+                if not chunks:
+                    return None
+
+                # Embed all chunks
+                chunk_embeddings: List[np.ndarray] = []
+                for chunk in chunks:
+                    emb = await embed_single_chunk(client, chunk, EMBEDDING_MODEL)
+                    if emb is not None:
+                        chunk_embeddings.append(emb)
+
+                if not chunk_embeddings:
+                    logger.error("All chunk embeddings failed")
+                    return None
+
+                # Average pooling + L2 normalization
+                stack = np.stack(chunk_embeddings)
+                mean_vec = np.mean(stack, axis=0)
+                norm = np.linalg.norm(mean_vec)
+                if norm > 1e-9:
+                    mean_vec /= norm
+
+                # Convert back to plain Python list – crucial for compatibility
+                embedding_list = mean_vec.tolist()
+
+                logger.debug(f"Final embedding dimension: {len(embedding_list)} "
+                             f"(averaged from {len(chunk_embeddings)} chunk(s))")
+                return embedding_list
+
             except Exception as e:
                 logger.error(
-                    f"Error fetching embedding for text: {text}. Error: {str(e)}"
+                    f"Error fetching embedding for text (length {len(text)}): {str(e)}"
                 )
-                return
+                return None
