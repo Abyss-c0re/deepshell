@@ -534,7 +534,7 @@ class HistoryManager:
             else query
         )
 
-        logger.debug(f"Generated prompt: {prompt}")
+        #logger.debug(f"Generated prompt: {prompt}")
         await self.add_message("user", prompt, embedding)
 
         return self.current_topic.history[-num_messages:]

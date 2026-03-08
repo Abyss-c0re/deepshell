@@ -31,7 +31,7 @@ class PipeFilter:
 
             self.client.last_response = full_input
             self.extracted_code = await self.extract_code(response=full_input)
-            logger.debug(f"Extracted code: {self.extracted_code}")
+            #logger.debug(f"Extracted code: {self.extracted_code}")
             return
 
         # --- Default behavior: Process thoughts and full response ---
@@ -93,7 +93,7 @@ class PipeFilter:
 
         self.client.last_response = results
         self.client.thoughts = thought_buffer
-        logger.debug(f"PipeFilter output: {results} \nThoughts: {thought_buffer}")
+        #logger.debug(f"PipeFilter output: {results}")
 
     async def process_static(self, text: str, extract_code: bool = False) -> str:
         """
