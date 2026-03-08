@@ -1,6 +1,7 @@
 aiofiles
 numpy
 openai
+tiktoken
 Pillow
 python_magic
 scikit_learn
