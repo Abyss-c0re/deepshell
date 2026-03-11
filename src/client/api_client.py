@@ -153,8 +153,15 @@ class LLMClient:
                 response = await self.client.chat.completions.create(
                     model=self.model,
                     messages=messages,
-                    temperature=self.config["temperature"],
+                    #temperature=self.config["temperature"],
+                    temperature=0.7,
                     stream=self.stream,
+                    top_p=0.8,
+                    presence_penalty=1.5,
+                    extra_body={
+                        "top_k": 20,
+                        "chat_template_kwargs": {"enable_thinking": False},
+                    },
                 )
 
                 async for part in response:
